@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Groups — Job Poster</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <h1>Job Poster</h1>
+    </header>
+
+    <main>
+      <section class="page-content">
+        <div class="panel-header">
+          <h2>Facebook Groups</h2>
+          <button class="btn-primary" id="new-group-btn">+ New Group</button>
+        </div>
+
+        <div id="group-form-wrap" class="form-card hidden">
+          <h3 id="group-form-title">New Group</h3>
+          <form id="group-form">
+            <input type="hidden" id="group-id">
+            <label>
+              Group name
+              <input type="text" id="group-name" required placeholder="e.g. Cairo Call Center Jobs">
+            </label>
+            <label>
+              Group URL
+              <input type="url" id="group-url" required placeholder="https://www.facebook.com/groups/...">
+            </label>
+            <label>
+              Notes (optional)
+              <input type="text" id="group-notes" placeholder="e.g. approves instantly, high traffic">
+            </label>
+            <label class="inline">
+              <input type="checkbox" id="group-status">
+              Paused (skip when posting)
+            </label>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">Save</button>
+              <button type="button" class="btn-secondary" id="group-cancel-btn">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <div id="groups-empty" class="empty-state hidden">
+          <p>No groups yet.</p>
+          <p class="empty-sub">Add the Facebook groups you post offers into.</p>
+        </div>
+
+        <table class="data-table hidden" id="groups-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>URL</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="groups-tbody"></tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/nav.js"></script>
+  <script src="js/groups.js"></script>
+</body>
+</html>

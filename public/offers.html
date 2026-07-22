@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offers — Job Poster</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <h1>Job Poster</h1>
+    </header>
+
+    <main>
+      <section class="page-content">
+        <div class="panel-header">
+          <h2>Job Offers</h2>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-primary" id="new-offer-btn">+ New Offer</button>
+            <button class="btn-secondary" id="bulk-import-btn">Bulk import</button>
+          </div>
+        </div>
+
+        <div id="bulk-import-wrap" class="form-card hidden">
+          <h3>Bulk Import Offers</h3>
+          <form id="bulk-import-form">
+            <label>
+              Paste offers (one per line, format: Title | Description)
+              <textarea id="bulk-import-textarea" rows="8" required placeholder="Software Engineer | We're looking for...
+Product Manager | Join our team..."></textarea>
+            </label>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">Import</button>
+              <button type="button" class="btn-secondary" id="bulk-import-cancel-btn">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <div id="offer-form-wrap" class="form-card hidden">
+          <h3 id="offer-form-title">New Offer</h3>
+          <form id="offer-form">
+            <input type="hidden" id="offer-id">
+            <label>
+              Title
+              <input type="text" id="offer-title" required placeholder="e.g. Bilingual Call Center Agent — Remote">
+            </label>
+            <label>
+              Description
+              <textarea id="offer-description" rows="5" required placeholder="Full offer text as it will be posted..."></textarea>
+            </label>
+            <label class="inline">
+              <input type="checkbox" id="offer-status">
+              Paused (won't be picked up for posting)
+            </label>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">Save</button>
+              <button type="button" class="btn-secondary" id="offer-cancel-btn">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <div id="offers-empty" class="empty-state hidden">
+          <p>No offers yet.</p>
+          <p class="empty-sub">Add your first job offer to get started.</p>
+        </div>
+
+        <table class="data-table hidden" id="offers-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Added</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="offers-tbody"></tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/nav.js"></script>
+  <script src="js/offers.js"></script>
+</body>
+</html>

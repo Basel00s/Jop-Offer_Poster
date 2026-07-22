@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Job Poster</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <h1>Job Poster</h1>
+    </header>
+
+    <main>
+      <section class="page-content">
+        <div id="health-strip" class="health-strip">
+          <p id="health-strip-empty" class="health-strip-empty">No accounts configured.</p>
+          <div id="health-strip-pills" class="health-strip-pills hidden"></div>
+        </div>
+
+        <div class="panel-header">
+          <h2>Post</h2>
+        </div>
+
+        <div class="form-card" id="post-composer">
+          <div class="post-composer-grid">
+            <label>
+              Accounts
+              <select id="post-accounts" class="multi-select" multiple size="6"></select>
+            </label>
+            <label>
+              Groups
+              <select id="post-groups" class="multi-select" multiple size="6"></select>
+            </label>
+            <label>
+              Offers
+              <select id="post-offers" class="multi-select" multiple size="6"></select>
+            </label>
+          </div>
+          <p class="multi-select-hint">Hold Ctrl (or Cmd) to select multiple items.</p>
+          <div class="form-actions">
+            <button type="button" class="btn-primary" id="post-submit-btn">Post</button>
+          </div>
+          <p id="post-success" class="success-message hidden"></p>
+        </div>
+
+        <div class="panel-header history-header">
+          <h2>Post History</h2>
+        </div>
+
+        <div class="history-filters">
+          <label>
+            Status
+            <select id="history-status-filter" class="filter-select">
+              <option value="">All</option>
+              <option value="queued">queued</option>
+              <option value="posted">posted</option>
+              <option value="pending_approval">pending_approval</option>
+              <option value="failed">failed</option>
+              <option value="skipped">skipped</option>
+            </select>
+          </label>
+          <label>
+            Account
+            <select id="history-account-filter" class="filter-select">
+              <option value="">All</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="history-empty" class="empty-state hidden">
+          <p>No post jobs yet.</p>
+          <p class="empty-sub">Queued jobs will appear here.</p>
+        </div>
+
+        <table class="data-table hidden" id="history-table">
+          <thead>
+            <tr>
+              <th>Offer</th>
+              <th>Group</th>
+              <th>Account</th>
+              <th>Status</th>
+              <th>Time</th>
+              <th>Error</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody"></tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/nav.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

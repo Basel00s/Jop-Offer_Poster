@@ -1,0 +1,20 @@
+{
+  "name": "job-poster",
+  "version": "1.0.0",
+  "description": "Manage job offers and Facebook groups, and (later) auto-post them with Playwright.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "mongoose": "^8.5.0",
+    "dotenv": "^16.4.5",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "playwright": "^1.46.0"
+  }
+}

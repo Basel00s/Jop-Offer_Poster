@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accounts — Job Poster</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <h1>Job Poster</h1>
+    </header>
+
+    <main>
+      <section class="page-content">
+        <!-- List View -->
+        <div id="accounts-list-view">
+          <div class="panel-header">
+            <h2>Facebook Accounts</h2>
+            <button class="btn-primary" id="new-account-btn">+ New Account</button>
+          </div>
+
+          <div id="account-form-wrap" class="form-card hidden">
+            <h3 id="account-form-title">New Account</h3>
+            <form id="account-form">
+              <input type="hidden" id="account-id">
+              <label>
+                Nickname
+                <input type="text" id="account-nickname" required placeholder="e.g. acc-1">
+              </label>
+              <label>
+                Status
+                <select id="account-status">
+                  <option value="active">active</option>
+                  <option value="cooldown">cooldown</option>
+                  <option value="checkpoint">checkpoint</option>
+                  <option value="disabled">disabled</option>
+                </select>
+              </label>
+              <label>
+                Daily post cap
+                <input type="number" id="account-daily-post-cap" min="1" value="40" required>
+              </label>
+              <label>
+                Notes
+                <input type="text" id="account-notes" placeholder="Optional notes about this account">
+              </label>
+              <p id="account-last-used" class="read-only-field hidden">
+                Last used: <span id="account-last-used-value"></span>
+              </p>
+              <div class="form-actions">
+                <button type="submit" class="btn-primary">Save</button>
+                <button type="button" class="btn-secondary" id="account-cancel-btn">Cancel</button>
+              </div>
+            </form>
+          </div>
+
+          <div id="accounts-empty" class="empty-state hidden">
+            <p>No accounts yet.</p>
+            <p class="empty-sub">Add a Facebook account to get started.</p>
+          </div>
+
+          <table class="data-table hidden" id="accounts-table">
+            <thead>
+              <tr>
+                <th>Nickname</th>
+                <th>Status</th>
+                <th>Posts today</th>
+                <th>Last used</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="accounts-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- Detail View -->
+        <div id="account-detail-view" class="hidden">
+          <div class="panel-header">
+            <button class="btn-secondary" id="back-to-list-btn">&larr; Back</button>
+            <h2 id="detail-account-name"></h2>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-primary" id="login-btn">Login to Facebook</button>
+              <button class="btn-secondary" id="edit-account-detail-btn">Edit Account</button>
+            </div>
+          </div>
+
+          <!-- Groups Section -->
+          <div class="panel-header">
+            <h2>Groups</h2>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-primary" id="add-group-btn">+ Add Group</button>
+              <button class="btn-secondary" id="bulk-add-groups-btn">Bulk Add</button>
+            </div>
+          </div>
+
+          <div id="group-form-wrap" class="form-card hidden">
+            <h3>New Group</h3>
+            <form id="group-form">
+              <label>
+                Group name
+                <input type="text" id="group-name" required placeholder="e.g. Cairo Call Center Jobs">
+              </label>
+              <label>
+                Group URL
+                <input type="url" id="group-url" required placeholder="https://www.facebook.com/groups/...">
+              </label>
+              <label>
+                Notes (optional)
+                <input type="text" id="group-notes" placeholder="e.g. approves instantly, high traffic">
+              </label>
+              <label class="inline">
+                <input type="checkbox" id="group-status">
+                Paused (skip when posting)
+              </label>
+              <div class="form-actions">
+                <button type="submit" class="btn-primary">Save</button>
+                <button type="button" class="btn-secondary" id="group-cancel-btn">Cancel</button>
+              </div>
+            </form>
+          </div>
+
+          <div id="bulk-groups-wrap" class="form-card hidden">
+            <h3>Bulk Add Groups</h3>
+            <form id="bulk-groups-form">
+              <label>
+                Paste Facebook group links (one per line)
+                <textarea id="bulk-groups-textarea" rows="8" required placeholder="https://www.facebook.com/groups/cairocallcenterjobs
+https://www.facebook.com/groups/alextechjobs"></textarea>
+              </label>
+              <div class="form-actions">
+                <button type="submit" class="btn-primary">Add Groups</button>
+                <button type="button" class="btn-secondary" id="bulk-groups-cancel-btn">Cancel</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Edit Group Name Form -->
+          <div id="edit-group-name-wrap" class="form-card hidden">
+            <h3>Rename Group</h3>
+            <form id="edit-group-name-form">
+              <input type="hidden" id="edit-group-id">
+              <label>
+                New Group Name
+                <input type="text" id="edit-group-name" required>
+              </label>
+              <div class="form-actions">
+                <button type="submit" class="btn-primary">Save</button>
+                <button type="button" class="btn-secondary" id="edit-group-name-cancel-btn">Cancel</button>
+              </div>
+            </form>
+          </div>
+
+          <div id="groups-empty" class="empty-state hidden">
+            <p>No groups yet.</p>
+            <p class="empty-sub">Add the Facebook groups this account posts offers into.</p>
+          </div>
+
+          <table class="data-table hidden" id="groups-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>URL</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="groups-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/nav.js"></script>
+  <script src="js/accounts.js"></script>
+</body>
+</html>
