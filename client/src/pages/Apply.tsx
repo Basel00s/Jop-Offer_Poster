@@ -27,17 +27,6 @@ export default function Apply() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  const validate = (f: typeof form) => {
-    const e: Record<string, string> = {};
-    if (f.name.trim().length < 3) e.name = 'Name must be at least 3 characters';
-    const digitsOnly = f.phone.replace(/\D/g, '');
-    if (digitsOnly.length < 8) e.phone = 'Phone must contain at least 8 numbers';
-    const url = f.recordingUrl.trim().toLowerCase();
-    if (!url.startsWith('http') || !['vocaroo', 'soundcloud', 'youtube'].some((s) => url.includes(s)))
-      e.recordingUrl = 'Link must start with http and contain Vocaroo, SoundCloud, or YouTube';
-    return e;
-  };
-
   const [form, setForm] = useState({
     name: '',
     phone: '',
@@ -49,6 +38,19 @@ export default function Apply() {
     position: '',
     recordingUrl: '',
   });
+
+  const validate = (f: typeof form) => {
+    const e: Record<string, string> = {};
+    if (f.name.trim().length < 3) e.name = 'Name must be at least 3 characters';
+    const digitsOnly = f.phone.replace(/\D/g, '');
+    if (digitsOnly.length < 8) e.phone = 'Phone must contain at least 8 numbers';
+    const url = f.recordingUrl.trim().toLowerCase();
+    if (!url.startsWith('http://') && !url.startsWith('https://'))
+      e.recordingUrl = 'Link must start with http:// or https://';
+    return e;
+  };
+
+  const hasErrors = Object.keys(validate(form)).length > 0;
 
   useEffect(() => {
     if (!slug) {
@@ -72,7 +74,10 @@ export default function Apply() {
   }, [slug]);
 
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const next = { ...form, [field]: e.target.value };
+    let value = e.target.value;
+    if (field === 'phone') value = value.replace(/\D/g, '');
+    if (field === 'nationality') value = value.replace(/[0-9]/g, '');
+    const next = { ...form, [field]: value };
     setForm(next);
     setTouched((t) => ({ ...t, [field]: true }));
     setErrors(validate(next));
@@ -158,8 +163,6 @@ export default function Apply() {
   const labelClass = 'block text-sm text-text-secondary font-medium';
   const fieldsetClass = 'rounded-xl border border-border bg-surface p-6';
   const selectClass = inputClass;
-
-  const hasErrors = Object.keys(errors).length > 0;
 
   if (loading) return null;
 
@@ -310,11 +313,11 @@ export default function Apply() {
                     }}
                     className={`rounded-xl border p-5 cursor-pointer transition-all duration-150 ${
                       selected
-                        ? 'border-accent bg-accent/5 shadow-[0_0_0_1px_rgba(139,92,246,0.3)]'
-                        : 'border-border bg-surface hover:border-accent/40 hover:bg-white/[0.02]'
+                        ? 'border-violet-500 bg-violet-50 shadow-sm'
+                        : 'border-slate-200 bg-white hover:border-violet-400 hover:bg-violet-50/30'
                     }`}
                   >
-                    <h3 className={`font-semibold text-sm mb-2 ${selected ? 'text-accent' : 'text-text-primary'}`}>
+                    <h3 className={`font-semibold text-sm mb-2 ${selected ? 'text-violet-700' : 'text-text-primary'}`}>
                       {p.title}
                     </h3>
                     <p className="text-xs text-text-muted leading-relaxed mb-3 line-clamp-3">
