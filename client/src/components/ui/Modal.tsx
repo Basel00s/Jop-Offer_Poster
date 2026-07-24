@@ -1,15 +1,12 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-
 interface ModalProps {
   open: boolean;
   onClose: () => void;
   title: string;
   children: ReactNode;
 }
-
 export default function Modal({ open, onClose, title, children }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
@@ -18,9 +15,7 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [open, onClose]);
-
   if (!open) return null;
-
   return (
     <div
       ref={overlayRef}
@@ -44,7 +39,7 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
             </svg>
           </button>
         </div>
-        <div className="px-6 py-5 overflow-y-auto">{children}</div>
+        <div className="px-6 py-5 overflow-y-auto flex-1 min-h-0">{children}</div>
       </div>
     </div>
   );
