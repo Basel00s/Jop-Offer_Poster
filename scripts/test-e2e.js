@@ -835,29 +835,29 @@ function assert(condition, label, ctx) {
   }
 
   // ==========================================================
-  // 19. Security: no sessionPath in Accounts
+  // 19. Security: no sessionData in Accounts
   // ==========================================================
-  console.log('\n19. Security — no sessionPath leak in Accounts');
+  console.log('\n19. Security — no sessionData leak in Accounts');
 
-  async function checkNoSessionPath(label, cookie) {
+  async function checkNoSessionData(label, cookie) {
     try {
       const { res, json } = await api('GET', '/api/accounts', { cookie });
       assert(res.status === 200, `GET accounts ${label} 200`);
       const bodyStr = JSON.stringify(json);
-      assert(!bodyStr.includes('sessionPath'), `no sessionPath in ${label} list`, { body: json });
+      assert(!bodyStr.includes('sessionData'), `no sessionData in ${label} list`, { body: json });
       if (Array.isArray(json) && json.length > 0) {
         const { res: res2, json: single } = await api('GET', `/api/accounts/${json[0]._id}`, { cookie });
         assert(res2.status === 200, `GET single account ${label} 200`);
         const singleStr = JSON.stringify(single);
-        assert(!singleStr.includes('sessionPath'), `no sessionPath in ${label} single`, { body: single });
+        assert(!singleStr.includes('sessionData'), `no sessionData in ${label} single`, { body: single });
       }
     } catch (e) {
-      fail(`sessionPath check ${label}`, e);
+      fail(`sessionData check ${label}`, e);
     }
   }
 
-  await checkNoSessionPath('as recruiterA', cookieA);
-  await checkNoSessionPath('as owner', ownerCookie);
+  await checkNoSessionData('as recruiterA', cookieA);
+  await checkNoSessionData('as owner', ownerCookie);
 
   // ==========================================================
   // 20. As A: post-job, verify, dedup

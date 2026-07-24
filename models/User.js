@@ -28,9 +28,9 @@ function randomSuffix() {
   return crypto.randomBytes(3).toString('hex');
 }
 
-async function generateUniqueSlug(name) {
+async function generateUniqueSlug(name, role) {
   const base = slugify(name) || 'user';
-  let slug = base;
+  let slug = role === 'recruiter' ? `${base}-${randomSuffix()}` : base;
   for (let i = 0; i < 10; i++) {
     const exists = await mongoose.model('User').findOne({ applySlug: slug });
     if (!exists) return slug;

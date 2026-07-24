@@ -57,7 +57,7 @@ router.post('/recruiters', async (req, res) => {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const applySlug = await User.generateApplySlug(name);
+    const applySlug = await User.generateApplySlug(name, 'recruiter');
 
     const user = await User.create({ name, email, passwordHash, role: 'recruiter', applySlug });
     res.status(201).json({

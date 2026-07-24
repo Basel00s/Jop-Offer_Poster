@@ -1,0 +1,16 @@
+{
+  "name": "job-poster-worker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright-based worker that processes the PostJob queue",
+  "main": "postWorker.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node postWorker.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "mongoose": "^8.5.0",
+    "playwright": "^1.46.0"
+  }
+}

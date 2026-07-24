@@ -16,5 +16,14 @@ services:
     volumes:
       - ./sessions:/app/sessions
     restart: unless-stopped
+  worker:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/job-poster
+    restart: unless-stopped
 volumes:
   mongo-data:

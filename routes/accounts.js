@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
 const Account = require('../models/Account');
 const Group = require('../models/Group');
 const { extractGroupIdFromUrl } = require('../utils/extractGroupId');
 
 function toPublicAccount(account) {
   const doc = account.toObject ? account.toObject() : account;
-  const { sessionPath, ...publicFields } = doc;
-  return { ...publicFields, hasSession: !!sessionPath };
+  const { sessionData, ...publicFields } = doc;
+  return { ...publicFields, hasSession: !!sessionData };
 }
 
 // GET all accounts
@@ -79,11 +78,29 @@ router.delete('/:id', async (req, res) => {
     await Account.findByIdAndDelete(req.params.id);
     // Also delete associated groups
     await Group.deleteMany({ accountId: req.params.id });
-    // Delete session file if it exists
-    if (account.sessionPath && fs.existsSync(account.sessionPath)) {
-      fs.unlinkSync(account.sessionPath);
-    }
     res.json({ deleted: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// UPLOAD session data
+router.post('/:id/session', async (req, res) => {
+  try {
+    const account = await Account.findById(req.params.id);
+    if (!account) return res.status(404).json({ error: 'Account not found' });
+    if (account.owner.toString() !== req.session.userId && req.session.role !== 'owner') {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+    const { sessionData } = req.body;
+    if (!sessionData || typeof sessionData !== 'object') {
+      return res.status(400).json({ error: 'sessionData is required' });
+    }
+    account.sessionData = sessionData;
+    account.status = 'active';
+    account.lastUsedAt = new Date();
+    await account.save();
+    res.json({ success: true });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

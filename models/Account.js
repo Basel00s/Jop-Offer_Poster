@@ -13,9 +13,9 @@ const accountSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
-    sessionPath: {
-      type: String,
-      default: '',
+    sessionData: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
     },
     status: {
       type: String,
@@ -37,6 +37,14 @@ const accountSchema = new mongoose.Schema(
       type: String,
       trim: true,
       default: '',
+    },
+    cooldownUntil: {
+      type: Date,
+      default: null,
+    },
+    dailyCountResetAt: {
+      type: Date,
+      default: null,
     },
   },
   { timestamps: true }
