@@ -4,7 +4,13 @@ const Offer = require('../models/Offer');
 
 // GET all offers
 router.get('/', async (req, res) => {
-  const offers = await Offer.find().sort({ createdAt: -1 });
+  const filter = {};
+  if (req.session.role === 'recruiter') {
+    filter.owner = req.session.userId;
+  } else if (req.query.ownerId) {
+    filter.owner = req.query.ownerId;
+  }
+  const offers = await Offer.find(filter).sort({ createdAt: -1 });
   res.json(offers);
 });
 
@@ -22,7 +28,9 @@ router.post('/', async (req, res) => {
     if (!title || !description) {
       return res.status(400).json({ error: 'title and description are required' });
     }
-    const offer = await Offer.create({ title, description, status });
+    const offer = new Offer({ title, description, status });
+    offer.owner = req.session.userId;
+    await offer.save();
     res.status(201).json(offer);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -32,14 +40,18 @@ router.post('/', async (req, res) => {
 // UPDATE offer (edit text, pause/activate)
 router.put('/:id', async (req, res) => {
   try {
+    const offer = await Offer.findById(req.params.id);
+    if (!offer) return res.status(404).json({ error: 'Offer not found' });
+    if (offer.owner.toString() !== req.session.userId && req.session.role !== 'owner') {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
     const { title, description, status } = req.body;
-    const offer = await Offer.findByIdAndUpdate(
+    const updated = await Offer.findByIdAndUpdate(
       req.params.id,
       { title, description, status },
       { new: true, runValidators: true }
     );
-    if (!offer) return res.status(404).json({ error: 'Offer not found' });
-    res.json(offer);
+    res.json(updated);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -63,7 +75,8 @@ router.post('/bulk', async (req, res) => {
         await Offer.create({
           title: offerData.title.trim(),
           description: offerData.description.trim(),
-          status: 'active'
+          status: 'active',
+          owner: req.session.userId
         });
         results.created++;
       } catch (err) {
@@ -83,9 +96,17 @@ router.post('/bulk', async (req, res) => {
 
 // DELETE offer
 router.delete('/:id', async (req, res) => {
-  const offer = await Offer.findByIdAndDelete(req.params.id);
-  if (!offer) return res.status(404).json({ error: 'Offer not found' });
-  res.json({ deleted: true });
+  try {
+    const offer = await Offer.findById(req.params.id);
+    if (!offer) return res.status(404).json({ error: 'Offer not found' });
+    if (offer.owner.toString() !== req.session.userId && req.session.role !== 'owner') {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+    await Offer.findByIdAndDelete(req.params.id);
+    res.json({ deleted: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 module.exports = router;

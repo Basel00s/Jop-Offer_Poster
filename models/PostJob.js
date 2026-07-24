@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 
 const postJobSchema = new mongoose.Schema(
   {
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     offer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Offer',

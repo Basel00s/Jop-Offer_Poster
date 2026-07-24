@@ -79,7 +79,10 @@
         <div id="account-detail-view" class="hidden">
           <div class="panel-header">
             <button class="btn-secondary" id="back-to-list-btn">&larr; Back</button>
-            <h2 id="detail-account-name"></h2>
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+              <h2 id="detail-account-name" style="margin:0;"></h2>
+              <span id="session-status" class="status-pill"></span>
+            </div>
             <div style="display:flex; gap:8px;">
               <button class="btn-primary" id="login-btn">Login to Facebook</button>
               <button class="btn-secondary" id="edit-account-detail-btn">Edit Account</button>

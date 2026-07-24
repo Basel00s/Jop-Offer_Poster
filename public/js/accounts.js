@@ -10,6 +10,10 @@ async function api(path, options = {}) {
     headers: { 'Content-Type': 'application/json' },
     ...options,
   });
+  if (res.status === 401) {
+    window.location.href = '/login.html';
+    throw new Error('Session expired');
+  }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error || `Request failed (${res.status})`);
@@ -45,6 +49,8 @@ const accountsEmpty = document.getElementById('accounts-empty');
 // Detail View Elements
 const accountDetailView = document.getElementById('account-detail-view');
 const detailAccountName = document.getElementById('detail-account-name');
+const sessionStatus = document.getElementById('session-status');
+const loginBtn = document.getElementById('login-btn');
 const groupFormWrap = document.getElementById('group-form-wrap');
 const groupForm = document.getElementById('group-form');
 const groupNameField = document.getElementById('group-name');
@@ -143,6 +149,17 @@ async function showDetailView(accountId) {
   if (!account) return;
 
   detailAccountName.textContent = account.nickname;
+
+  if (account.hasSession) {
+    sessionStatus.textContent = 'Connected';
+    sessionStatus.className = 'status-pill active';
+    loginBtn.textContent = 'Re-login to Facebook';
+  } else {
+    sessionStatus.textContent = 'Not connected';
+    sessionStatus.className = 'status-pill paused';
+    loginBtn.textContent = 'Login to Facebook';
+  }
+
   accountsListView.classList.add('hidden');
   accountDetailView.classList.remove('hidden');
   await loadGroupsForAccount(accountId);
@@ -158,12 +175,16 @@ document.getElementById('add-group-btn').addEventListener('click', showGroupForm
 document.getElementById('group-cancel-btn').addEventListener('click', hideGroupForm);
 document.getElementById('bulk-add-groups-btn').addEventListener('click', showBulkGroupsForm);
 document.getElementById('bulk-groups-cancel-btn').addEventListener('click', hideBulkGroupsForm);
-document.getElementById('login-btn').addEventListener('click', async () => {
+loginBtn.addEventListener('click', async () => {
   if (!currentAccountId) return;
-  if (!confirm('This will open a browser window for you to login to Facebook. When you are done, close the browser to save the session. Continue?')) return;
+  const verb = loginBtn.textContent.includes('Re-login') ? 'Re-login' : 'Login';
+  if (!confirm(`This will open a browser window for you to ${verb.toLowerCase()} to Facebook. When you are done, click the "Done" button on the page to save the session. Continue?`)) return;
   try {
-    alert('Opening browser... Please login to Facebook, then close the browser window to save your session.');
+    alert('Opening browser... Please log in to Facebook, then click the "✅ Done — Save Session" button on the page.');
     await api(`/api/accounts/${currentAccountId}/session`, { method: 'POST' });
+    await loadAccounts();
+    const updated = (window.__accounts || []).find((a) => a._id === currentAccountId);
+    if (updated) showDetailView(currentAccountId);
     alert('Session saved successfully!');
   } catch (err) {
     alert(err.message);
@@ -171,7 +192,10 @@ document.getElementById('login-btn').addEventListener('click', async () => {
 });
 document.getElementById('edit-account-detail-btn').addEventListener('click', () => {
   const account = (window.__accounts || []).find((a) => a._id === currentAccountId);
-  if (account) showAccountForm(account);
+  if (account) {
+    showListView();
+    showAccountForm(account);
+  }
 });
 editGroupNameCancelBtn.addEventListener('click', hideEditGroupNameForm);
 

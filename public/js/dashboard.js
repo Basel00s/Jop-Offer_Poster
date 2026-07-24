@@ -14,11 +14,17 @@ const historyEmpty = document.getElementById('history-empty');
 const historyTable = document.getElementById('history-table');
 const historyTbody = document.getElementById('history-tbody');
 
+let allGroups = [];
+
 async function api(path, options = {}) {
   const res = await fetch(path, {
     headers: { 'Content-Type': 'application/json' },
     ...options,
   });
+  if (res.status === 401) {
+    window.location.href = '/login.html';
+    throw new Error('Session expired');
+  }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error || `Request failed (${res.status})`);
@@ -96,22 +102,39 @@ async function loadComposerOptions() {
     api('/api/offers'),
   ]);
 
+  allGroups = groups;
+
   fillMultiSelect(
     postAccountsSelect,
     accounts.filter((a) => a.status === 'active'),
     'nickname'
   );
   fillMultiSelect(
-    postGroupsSelect,
-    groups.filter((g) => g.status === 'active'),
-    'name'
-  );
-  fillMultiSelect(
     postOffersSelect,
     offers.filter((o) => o.status === 'active'),
     'title'
   );
+
+  updateGroupSelect();
 }
+
+function updateGroupSelect() {
+  const selectedAccountIds = getSelectedIds(postAccountsSelect);
+
+  if (!selectedAccountIds.length) {
+    postGroupsSelect.innerHTML =
+      '<option value="" disabled selected style="display:none;">Select an account first</option>';
+    return;
+  }
+
+  const matching = allGroups.filter(
+    (g) => g.status === 'active' && g.accountId && selectedAccountIds.includes(g.accountId)
+  );
+
+  fillMultiSelect(postGroupsSelect, matching, 'name');
+}
+
+postAccountsSelect.addEventListener('change', updateGroupSelect);
 
 function hidePostSuccess() {
   postSuccess.classList.add('hidden');

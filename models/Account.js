@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 
 const accountSchema = new mongoose.Schema(
   {
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     nickname: {
       type: String,
       required: true,

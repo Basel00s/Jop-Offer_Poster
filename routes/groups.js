@@ -1,20 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const Group = require('../models/Group');
-
-// Helper to extract group id/slug from Facebook URL
-function extractGroupIdFromUrl(url) {
-  const regex = /facebook\.com\/groups\/([^/?#]+)/;
-  const match = url.match(regex);
-  if (match && match[1]) {
-    return match[1];
-  }
-  return null;
-}
+const { extractGroupIdFromUrl } = require('../utils/extractGroupId');
 
 // GET all groups
 router.get('/', async (req, res) => {
-  const groups = await Group.find().sort({ createdAt: -1 });
+  const filter = {};
+  if (req.session.role === 'recruiter') {
+    filter.owner = req.session.userId;
+  } else if (req.query.ownerId) {
+    filter.owner = req.query.ownerId;
+  }
+  const groups = await Group.find(filter).sort({ createdAt: -1 });
   res.json(groups);
 });
 
@@ -38,7 +35,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Invalid Facebook group URL' });
     }
 
-    const group = await Group.create({ name, url, groupId, notes, status });
+    const group = await Group.create({ owner: req.session.userId, name, url, groupId, notes, status });
     res.status(201).json(group);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -48,6 +45,11 @@ router.post('/', async (req, res) => {
 // UPDATE group
 router.put('/:id', async (req, res) => {
   try {
+    const group = await Group.findById(req.params.id);
+    if (!group) return res.status(404).json({ error: 'Group not found' });
+    if (group.owner.toString() !== req.session.userId && req.session.role !== 'owner') {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
     const { name, url, notes, status } = req.body;
     const updateData = { name, notes, status };
     if (url) {
@@ -59,13 +61,12 @@ router.put('/:id', async (req, res) => {
       updateData.groupId = groupId;
     }
 
-    const group = await Group.findByIdAndUpdate(
+    const updated = await Group.findByIdAndUpdate(
       req.params.id,
       updateData,
       { new: true, runValidators: true }
     );
-    if (!group) return res.status(404).json({ error: 'Group not found' });
-    res.json(group);
+    res.json(updated);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -73,9 +74,17 @@ router.put('/:id', async (req, res) => {
 
 // DELETE group
 router.delete('/:id', async (req, res) => {
-  const group = await Group.findByIdAndDelete(req.params.id);
-  if (!group) return res.status(404).json({ error: 'Group not found' });
-  res.json({ deleted: true });
+  try {
+    const group = await Group.findById(req.params.id);
+    if (!group) return res.status(404).json({ error: 'Group not found' });
+    if (group.owner.toString() !== req.session.userId && req.session.role !== 'owner') {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+    await Group.findByIdAndDelete(req.params.id);
+    res.json({ deleted: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 module.exports = router;
