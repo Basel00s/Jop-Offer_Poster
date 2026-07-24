@@ -39,11 +39,14 @@ router.post('/logout', (req, res) => {
   });
 });
 
-router.get('/me', (req, res) => {
+router.get('/me', async (req, res) => {
   if (req.session && req.session.userId) {
-    return res.json({ userId: req.session.userId, role: req.session.role });
+    const user = await User.findById(req.session.userId).select('name email role applySlug').lean();
+    if (user) {
+      return res.json({ userId: user._id.toString(), role: user.role, name: user.name, applySlug: user.applySlug });
+    }
   }
-  res.json({ userId: null, role: null });
+  res.json({ userId: null, role: null, applySlug: null });
 });
 
 module.exports = router;

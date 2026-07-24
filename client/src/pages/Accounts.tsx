@@ -41,6 +41,10 @@ export default function AccountsPage() {
   const [renameGroupName, setRenameGroupName] = useState('');
   const [renamingGroup, setRenamingGroup] = useState(false);
 
+  // Group selection when editing account
+  const [allGroups, setAllGroups] = useState<Group[]>([]);
+  const [selectedGroupIds, setSelectedGroupIds] = useState<Set<string>>(new Set());
+
   const loadAccounts = async () => {
     try {
       const data = await api<Account[]>('/api/accounts');
@@ -72,13 +76,16 @@ export default function AccountsPage() {
     setShowAccountForm(true);
   };
 
-  const openEditAccount = (a: Account) => {
+  const openEditAccount = async (a: Account) => {
     setEditAccount(a);
     setAccNickname(a.nickname);
     setAccStatus(a.status);
     setAccDailyCap(a.dailyPostCap);
     setAccNotes(a.notes || '');
     setShowAccountForm(true);
+    const groups = await api<Group[]>('/api/groups');
+    setAllGroups(groups);
+    setSelectedGroupIds(new Set(groups.filter((g) => g.accountId === a._id).map((g) => g._id)));
   };
 
   const handleSaveAccount = async (e: React.FormEvent) => {
@@ -92,6 +99,14 @@ export default function AccountsPage() {
         if (selectedAccount && selectedAccount._id === editAccount._id) {
           setSelectedAccount({ ...selectedAccount, ...payload, hasSession: selectedAccount.hasSession } as Account);
         }
+        const accountId = editAccount._id;
+        const prevIds = new Set(allGroups.filter((g) => g.accountId === accountId).map((g) => g._id));
+        const toLink = [...selectedGroupIds].filter((id) => !prevIds.has(id));
+        const toUnlink = [...prevIds].filter((id) => !selectedGroupIds.has(id));
+        await Promise.all([
+          ...toLink.map((id) => api(`/api/groups/${id}`, { method: 'PUT', body: JSON.stringify({ accountId }) })),
+          ...toUnlink.map((id) => api(`/api/groups/${id}`, { method: 'PUT', body: JSON.stringify({ accountId: null }) })),
+        ]);
       } else {
         await api('/api/accounts', { method: 'POST', body: JSON.stringify(payload) });
         showToast('Account created.', 'success');
@@ -414,6 +429,29 @@ export default function AccountsPage() {
               <Input label="Notes" value={accNotes} onChange={(e) => setAccNotes(e.target.value)} placeholder="Optional notes" />
               {editAccount?.lastUsedAt && (
                 <p className="text-xs text-text-muted">Last used: {new Date(editAccount.lastUsedAt).toLocaleDateString()}</p>
+              )}
+              {editAccount && allGroups.length > 0 && (
+                <div className="border-t border-border pt-4 mt-4">
+                  <p className="text-sm font-medium text-text-secondary mb-3">Linked Groups</p>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {allGroups.map((g) => (
+                      <label key={g._id} className="flex items-center gap-2.5 text-sm text-text-secondary cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedGroupIds.has(g._id)}
+                          onChange={(e) => {
+                            const next = new Set(selectedGroupIds);
+                            if (e.target.checked) next.add(g._id);
+                            else next.delete(g._id);
+                            setSelectedGroupIds(next);
+                          }}
+                          className="w-4 h-4 rounded border-border bg-bg-500 accent-accent"
+                        />
+                        {g.name}
+                      </label>
+                    ))}
+                  </div>
+                </div>
               )}
               <div className="flex gap-2 pt-1">
                 <Button type="submit" disabled={savingAccount}>{savingAccount ? 'Saving...' : 'Save'}</Button>

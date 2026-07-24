@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, Navigate, useLocation } from 'react-router-dom';
 import Toast from './ui/Toast';
 import api from '../lib/api';
 
@@ -74,12 +74,38 @@ const navItems = [
 
 export default function Layout() {
   const [role, setRole] = useState<string | null>(null);
+  const [applySlug, setApplySlug] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
-    api<{ role: string | null }>('/api/auth/me').then((data) => {
-      setRole(data.role);
-    }).catch(() => {});
+    api<{ role: string | null; applySlug: string | null }>('/api/auth/me')
+      .then((data) => {
+        setRole(data.role);
+        setApplySlug(data.applySlug);
+      })
+      .catch(() => setRole(null))
+      .finally(() => setIsLoading(false));
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-6 h-6 border-2 border-violet-600 border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-slate-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!role) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (role !== 'owner' && location.pathname.startsWith('/recruiters')) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const handleLogout = async () => {
     try {
@@ -157,7 +183,7 @@ export default function Layout() {
 
       <main className="flex-1 overflow-auto">
         <div className="max-w-[1400px] mx-auto px-8 py-8 animate-fade-in">
-          <Outlet context={{ role }} />
+          <Outlet context={{ role, applySlug }} />
         </div>
       </main>
 

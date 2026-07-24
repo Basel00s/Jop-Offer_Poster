@@ -54,8 +54,11 @@ router.put('/:id', async (req, res) => {
     if (group.owner.toString() !== req.session.userId && req.session.role !== 'owner') {
       return res.status(403).json({ error: 'Forbidden' });
     }
-    const { name, url, notes, status } = req.body;
+    const { name, url, notes, status, accountId } = req.body;
     const updateData = { name, notes, status };
+    if (req.body.hasOwnProperty('accountId')) {
+      updateData.accountId = accountId || null;
+    }
     if (url) {
       const groupId = extractGroupIdFromUrl(url);
       if (!groupId) {

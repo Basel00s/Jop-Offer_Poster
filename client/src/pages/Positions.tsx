@@ -9,7 +9,7 @@ import { Input, Textarea } from '../components/ui/Input';
 import { showToast } from '../components/ui/Toast';
 
 export default function PositionsPage() {
-  const { role } = useOutletContext<{ role: string | null }>();
+  const { role, applySlug } = useOutletContext<{ role: string | null; applySlug: string | null }>();
   const [positions, setPositions] = useState<Position[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editPos, setEditPos] = useState<Position | null>(null);
@@ -118,7 +118,22 @@ export default function PositionsPage() {
         <h2 className="text-xs font-bold uppercase tracking-wider text-accent pl-3 border-l-3 border-accent">
           Positions
         </h2>
-        <Button onClick={openNew}>+ New Position</Button>
+        <div className="flex gap-2">
+          <Button onClick={openNew}>+ New Position</Button>
+          {applySlug && (
+            <Button
+              variant="secondary"
+              onClick={() => {
+                const url = `${window.location.origin}/apply/${applySlug}`;
+                navigator.clipboard.writeText(url).then(() => {
+                  showToast('Apply link copied!', 'success');
+                });
+              }}
+            >
+              Copy Apply Link
+            </Button>
+          )}
+        </div>
       </div>
 
       {showForm && (
