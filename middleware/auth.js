@@ -3,7 +3,7 @@ function requireAuth(req, res, next) {
     return next();
   }
 
-  if (req.path.startsWith('/api/')) {
+  if (req.originalUrl.startsWith('/api/')) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
@@ -15,7 +15,7 @@ function requireOwner(req, res, next) {
     return next();
   }
 
-  if (req.path.startsWith('/api/')) {
+  if (req.originalUrl.startsWith('/api/')) {
     return res.status(403).json({ error: 'Forbidden' });
   }
 
