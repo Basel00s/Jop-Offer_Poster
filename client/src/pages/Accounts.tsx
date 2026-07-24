@@ -5,7 +5,6 @@ import type { Account, Group, BulkResult } from '../lib/types';
 import Button from '../components/ui/Button';
 import StatusPill from '../components/ui/StatusPill';
 import Table from '../components/ui/Table';
-import Modal from '../components/ui/Modal';
 import { Input, Textarea } from '../components/ui/Input';
 import { showToast } from '../components/ui/Toast';
 
@@ -312,51 +311,69 @@ export default function AccountsPage() {
           </div>
         </div>
 
-        {/* Single group form */}
-        <Modal open={showGroupForm} onClose={() => setShowGroupForm(false)} title="New Group">
-          <form onSubmit={handleSaveGroup} className="space-y-4">
-            <Input label="Group name" value={groupName} onChange={(e) => setGroupName(e.target.value)} required placeholder="e.g. Cairo Call Center Jobs" />
-            <Input label="Group URL" type="url" value={groupUrl} onChange={(e) => setGroupUrl(e.target.value)} required placeholder="https://www.facebook.com/groups/..." />
-            <Input label="Notes (optional)" value={groupNotes} onChange={(e) => setGroupNotes(e.target.value)} placeholder="e.g. approves instantly" />
-            <label className="flex items-center gap-2.5 text-sm text-text-secondary cursor-pointer">
-              <input type="checkbox" checked={groupPaused} onChange={(e) => setGroupPaused(e.target.checked)} className="w-4 h-4 rounded border-border bg-bg-500 accent-accent" />
-              Paused (skip when posting)
-            </label>
-            <div className="flex gap-2 pt-1">
-              <Button type="submit" disabled={savingGroup}>{savingGroup ? 'Saving...' : 'Save'}</Button>
-              <Button variant="secondary" type="button" onClick={() => setShowGroupForm(false)}>Cancel</Button>
+        {showGroupForm && (
+          <div className="rounded-xl border border-border bg-surface shadow-[0_4px_16px_rgba(0,0,0,0.3)] overflow-hidden">
+            <div className="px-5 py-4 border-b border-border">
+              <h3 className="text-sm font-semibold text-text-primary">New Group</h3>
             </div>
-          </form>
-        </Modal>
+            <div className="p-5">
+              <form onSubmit={handleSaveGroup} className="space-y-4">
+                <Input label="Group name" value={groupName} onChange={(e) => setGroupName(e.target.value)} required placeholder="e.g. Cairo Call Center Jobs" />
+                <Input label="Group URL" type="url" value={groupUrl} onChange={(e) => setGroupUrl(e.target.value)} required placeholder="https://www.facebook.com/groups/..." />
+                <Input label="Notes (optional)" value={groupNotes} onChange={(e) => setGroupNotes(e.target.value)} placeholder="e.g. approves instantly" />
+                <label className="flex items-center gap-2.5 text-sm text-text-secondary cursor-pointer">
+                  <input type="checkbox" checked={groupPaused} onChange={(e) => setGroupPaused(e.target.checked)} className="w-4 h-4 rounded border-border bg-bg-500 accent-accent" />
+                  Paused (skip when posting)
+                </label>
+                <div className="flex gap-2 pt-1">
+                  <Button type="submit" disabled={savingGroup}>{savingGroup ? 'Saving...' : 'Save'}</Button>
+                  <Button variant="secondary" type="button" onClick={() => setShowGroupForm(false)}>Cancel</Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
-        {/* Bulk groups form */}
-        <Modal open={showBulkGroups} onClose={() => setShowBulkGroups(false)} title="Bulk Add Groups">
-          <form onSubmit={handleBulkImport} className="space-y-4">
-            <Textarea
-              label="Paste Facebook group links (one per line)"
-              value={bulkText}
-              onChange={(e) => setBulkText(e.target.value)}
-              required
-              rows={6}
-              placeholder="https://www.facebook.com/groups/cairocallcenterjobs&#10;https://www.facebook.com/share/g/abc123/"
-            />
-            <div className="flex gap-2 pt-1">
-              <Button type="submit" disabled={importingBulk}>{importingBulk ? 'Importing...' : 'Add Groups'}</Button>
-              <Button variant="secondary" type="button" onClick={() => setShowBulkGroups(false)}>Cancel</Button>
+        {showBulkGroups && (
+          <div className="rounded-xl border border-border bg-surface shadow-[0_4px_16px_rgba(0,0,0,0.3)] overflow-hidden">
+            <div className="px-5 py-4 border-b border-border">
+              <h3 className="text-sm font-semibold text-text-primary">Bulk Add Groups</h3>
             </div>
-          </form>
-        </Modal>
+            <div className="p-5">
+              <form onSubmit={handleBulkImport} className="space-y-4">
+                <Textarea
+                  label="Paste Facebook group links (one per line)"
+                  value={bulkText}
+                  onChange={(e) => setBulkText(e.target.value)}
+                  required
+                  rows={6}
+                  placeholder="https://www.facebook.com/groups/cairocallcenterjobs&#10;https://www.facebook.com/share/g/abc123/"
+                />
+                <div className="flex gap-2 pt-1">
+                  <Button type="submit" disabled={importingBulk}>{importingBulk ? 'Importing...' : 'Add Groups'}</Button>
+                  <Button variant="secondary" type="button" onClick={() => setShowBulkGroups(false)}>Cancel</Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
-        {/* Rename group modal */}
-        <Modal open={!!renameGroupId} onClose={() => setRenameGroupId(null)} title="Rename Group">
-          <form onSubmit={handleRenameGroup} className="space-y-4">
-            <Input label="New group name" value={renameGroupName} onChange={(e) => setRenameGroupName(e.target.value)} required />
-            <div className="flex gap-2 pt-1">
-              <Button type="submit" disabled={renamingGroup}>{renamingGroup ? 'Saving...' : 'Save'}</Button>
-              <Button variant="secondary" type="button" onClick={() => setRenameGroupId(null)}>Cancel</Button>
+        {!!renameGroupId && (
+          <div className="rounded-xl border border-border bg-surface shadow-[0_4px_16px_rgba(0,0,0,0.3)] overflow-hidden">
+            <div className="px-5 py-4 border-b border-border">
+              <h3 className="text-sm font-semibold text-text-primary">Rename Group</h3>
             </div>
-          </form>
-        </Modal>
+            <div className="p-5">
+              <form onSubmit={handleRenameGroup} className="space-y-4">
+                <Input label="New group name" value={renameGroupName} onChange={(e) => setRenameGroupName(e.target.value)} required />
+                <div className="flex gap-2 pt-1">
+                  <Button type="submit" disabled={renamingGroup}>{renamingGroup ? 'Saving...' : 'Save'}</Button>
+                  <Button variant="secondary" type="button" onClick={() => setRenameGroupId(null)}>Cancel</Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
         <Table columns={groupColumns} data={groups} emptyMessage="No groups yet." emptySub="Add the Facebook groups this account posts offers into." />
       </div>
@@ -372,34 +389,40 @@ export default function AccountsPage() {
         <Button onClick={openNewAccount}>+ New Account</Button>
       </div>
 
-      {/* Account form modal */}
-      <Modal open={showAccountForm} onClose={() => setShowAccountForm(false)} title={editAccount ? 'Edit Account' : 'New Account'}>
-        <form onSubmit={handleSaveAccount} className="space-y-4">
-          <Input label="Nickname" value={accNickname} onChange={(e) => setAccNickname(e.target.value)} required placeholder="e.g. acc-1" />
-          <label className="block text-sm text-text-secondary font-medium">
-            Status
-            <select
-              value={accStatus}
-              onChange={(e) => setAccStatus(e.target.value)}
-              className="w-full mt-1.5 px-3.5 py-2.5 rounded-lg border border-border bg-bg-600 text-text-primary text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
-            >
-              <option value="active">active</option>
-              <option value="cooldown">cooldown</option>
-              <option value="checkpoint">checkpoint</option>
-              <option value="disabled">disabled</option>
-            </select>
-          </label>
-          <Input label="Daily post cap" type="number" min={1} value={accDailyCap} onChange={(e) => setAccDailyCap(Number(e.target.value))} required />
-          <Input label="Notes" value={accNotes} onChange={(e) => setAccNotes(e.target.value)} placeholder="Optional notes" />
-          {editAccount?.lastUsedAt && (
-            <p className="text-xs text-text-muted">Last used: {new Date(editAccount.lastUsedAt).toLocaleDateString()}</p>
-          )}
-          <div className="flex gap-2 pt-1">
-            <Button type="submit" disabled={savingAccount}>{savingAccount ? 'Saving...' : 'Save'}</Button>
-            <Button variant="secondary" type="button" onClick={() => setShowAccountForm(false)}>Cancel</Button>
+      {showAccountForm && (
+        <div className="rounded-xl border border-border bg-surface shadow-[0_4px_16px_rgba(0,0,0,0.3)] overflow-hidden">
+          <div className="px-5 py-4 border-b border-border">
+            <h3 className="text-sm font-semibold text-text-primary">{editAccount ? 'Edit Account' : 'New Account'}</h3>
           </div>
-        </form>
-      </Modal>
+          <div className="p-5">
+            <form onSubmit={handleSaveAccount} className="space-y-4">
+              <Input label="Nickname" value={accNickname} onChange={(e) => setAccNickname(e.target.value)} required placeholder="e.g. acc-1" />
+              <label className="block text-sm text-text-secondary font-medium">
+                Status
+                <select
+                  value={accStatus}
+                  onChange={(e) => setAccStatus(e.target.value)}
+                  className="w-full mt-1.5 px-3.5 py-2.5 rounded-lg border border-border bg-bg-600 text-text-primary text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+                >
+                  <option value="active">active</option>
+                  <option value="cooldown">cooldown</option>
+                  <option value="checkpoint">checkpoint</option>
+                  <option value="disabled">disabled</option>
+                </select>
+              </label>
+              <Input label="Daily post cap" type="number" min={1} value={accDailyCap} onChange={(e) => setAccDailyCap(Number(e.target.value))} required />
+              <Input label="Notes" value={accNotes} onChange={(e) => setAccNotes(e.target.value)} placeholder="Optional notes" />
+              {editAccount?.lastUsedAt && (
+                <p className="text-xs text-text-muted">Last used: {new Date(editAccount.lastUsedAt).toLocaleDateString()}</p>
+              )}
+              <div className="flex gap-2 pt-1">
+                <Button type="submit" disabled={savingAccount}>{savingAccount ? 'Saving...' : 'Save'}</Button>
+                <Button variant="secondary" type="button" onClick={() => setShowAccountForm(false)}>Cancel</Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <Table
         columns={accountColumns}

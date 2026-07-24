@@ -5,7 +5,6 @@ import type { Group } from '../lib/types';
 import Button from '../components/ui/Button';
 import StatusPill from '../components/ui/StatusPill';
 import Table from '../components/ui/Table';
-import Modal from '../components/ui/Modal';
 import { Input } from '../components/ui/Input';
 import { showToast } from '../components/ui/Toast';
 
@@ -122,21 +121,28 @@ export default function GroupsPage() {
         <Button onClick={openNew}>+ New Group</Button>
       </div>
 
-      <Modal open={showForm} onClose={() => setShowForm(false)} title={editGroup ? 'Edit Group' : 'New Group'}>
-        <form onSubmit={handleSave} className="space-y-4">
-          <Input label="Group name" value={name} onChange={(e) => setName(e.target.value)} required placeholder="e.g. Cairo Call Center Jobs" />
-          <Input label="Group URL" type="url" value={url} onChange={(e) => setUrl(e.target.value)} required placeholder="https://www.facebook.com/groups/..." />
-          <Input label="Notes (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="e.g. approves instantly" />
-          <label className="flex items-center gap-2.5 text-sm text-text-secondary cursor-pointer">
-            <input type="checkbox" checked={paused} onChange={(e) => setPaused(e.target.checked)} className="w-4 h-4 rounded border-border bg-bg-500 accent-accent" />
-            Paused (skip when posting)
-          </label>
-          <div className="flex gap-2 pt-1">
-            <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button>
-            <Button variant="secondary" type="button" onClick={() => setShowForm(false)}>Cancel</Button>
+      {showForm && (
+        <div className="rounded-xl border border-border bg-surface shadow-[0_4px_16px_rgba(0,0,0,0.3)] overflow-hidden">
+          <div className="px-5 py-4 border-b border-border">
+            <h3 className="text-sm font-semibold text-text-primary">{editGroup ? 'Edit Group' : 'New Group'}</h3>
           </div>
-        </form>
-      </Modal>
+          <div className="p-5">
+            <form onSubmit={handleSave} className="space-y-4">
+              <Input label="Group name" value={name} onChange={(e) => setName(e.target.value)} required placeholder="e.g. Cairo Call Center Jobs" />
+              <Input label="Group URL" type="url" value={url} onChange={(e) => setUrl(e.target.value)} required placeholder="https://www.facebook.com/groups/..." />
+              <Input label="Notes (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="e.g. approves instantly" />
+              <label className="flex items-center gap-2.5 text-sm text-text-secondary cursor-pointer">
+                <input type="checkbox" checked={paused} onChange={(e) => setPaused(e.target.checked)} className="w-4 h-4 rounded border-border bg-bg-500 accent-accent" />
+                Paused (skip when posting)
+              </label>
+              <div className="flex gap-2 pt-1">
+                <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button>
+                <Button variant="secondary" type="button" onClick={() => setShowForm(false)}>Cancel</Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <Table columns={columns} data={groups} emptyMessage="No groups yet." emptySub="Add the Facebook groups you post offers into." />
     </div>

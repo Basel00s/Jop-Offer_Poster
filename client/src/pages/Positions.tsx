@@ -5,7 +5,6 @@ import type { Position } from '../lib/types';
 import Button from '../components/ui/Button';
 import StatusPill from '../components/ui/StatusPill';
 import Table from '../components/ui/Table';
-import Modal from '../components/ui/Modal';
 import { Input, Textarea } from '../components/ui/Input';
 import { showToast } from '../components/ui/Toast';
 
@@ -122,23 +121,30 @@ export default function PositionsPage() {
         <Button onClick={openNew}>+ New Position</Button>
       </div>
 
-      <Modal open={showForm} onClose={() => setShowForm(false)} title={editPos ? 'Edit Position' : 'New Position'}>
-        <form onSubmit={handleSave} className="space-y-4">
-          <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="e.g. Call Center Agent" />
-          <Textarea label="Description" value={description} onChange={(e) => setDescription(e.target.value)} required rows={4} placeholder="Full description including responsibilities and requirements..." />
-          <Input label="Salary" value={salary} onChange={(e) => setSalary(e.target.value)} placeholder="e.g. $15-20/hr" />
-          <Input label="Hours" value={hours} onChange={(e) => setHours(e.target.value)} placeholder="e.g. Full-time, 40hrs/week" />
-          <Input label="Language Required" value={languageRequired} onChange={(e) => setLanguageRequired(e.target.value)} placeholder="e.g. English C1" />
-          <label className="flex items-center gap-2.5 text-sm text-text-secondary cursor-pointer">
-            <input type="checkbox" checked={paused} onChange={(e) => setPaused(e.target.checked)} className="w-4 h-4 rounded border-border bg-bg-500 accent-accent" />
-            Paused (won't appear on the apply page)
-          </label>
-          <div className="flex gap-2 pt-1">
-            <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button>
-            <Button variant="secondary" type="button" onClick={() => setShowForm(false)}>Cancel</Button>
+      {showForm && (
+        <div className="rounded-xl border border-border bg-surface shadow-[0_4px_16px_rgba(0,0,0,0.3)] overflow-hidden">
+          <div className="px-5 py-4 border-b border-border">
+            <h3 className="text-sm font-semibold text-text-primary">{editPos ? 'Edit Position' : 'New Position'}</h3>
           </div>
-        </form>
-      </Modal>
+          <div className="p-5">
+            <form onSubmit={handleSave} className="space-y-4">
+              <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="e.g. Call Center Agent" />
+              <Textarea label="Description" value={description} onChange={(e) => setDescription(e.target.value)} required rows={4} placeholder="Full description including responsibilities and requirements..." />
+              <Input label="Salary" value={salary} onChange={(e) => setSalary(e.target.value)} placeholder="e.g. $15-20/hr" />
+              <Input label="Hours" value={hours} onChange={(e) => setHours(e.target.value)} placeholder="e.g. Full-time, 40hrs/week" />
+              <Input label="Language Required" value={languageRequired} onChange={(e) => setLanguageRequired(e.target.value)} placeholder="e.g. English C1" />
+              <label className="flex items-center gap-2.5 text-sm text-text-secondary cursor-pointer">
+                <input type="checkbox" checked={paused} onChange={(e) => setPaused(e.target.checked)} className="w-4 h-4 rounded border-border bg-bg-500 accent-accent" />
+                Paused (won't appear on the apply page)
+              </label>
+              <div className="flex gap-2 pt-1">
+                <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button>
+                <Button variant="secondary" type="button" onClick={() => setShowForm(false)}>Cancel</Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <Table columns={columns} data={positions} emptyMessage="No positions yet." emptySub="Add your first position to get started." />
     </div>

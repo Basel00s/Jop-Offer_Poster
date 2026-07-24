@@ -3,7 +3,6 @@ import api from '../lib/api';
 import Button from '../components/ui/Button';
 import StatusPill from '../components/ui/StatusPill';
 import Table from '../components/ui/Table';
-import Modal from '../components/ui/Modal';
 import { Input } from '../components/ui/Input';
 import { showToast } from '../components/ui/Toast';
 import type { PostJob } from '../lib/types';
@@ -213,17 +212,24 @@ export default function AdminRecruitersPage() {
         <Button onClick={() => setShowForm(true)}>+ New Recruiter</Button>
       </div>
 
-      <Modal open={showForm} onClose={() => setShowForm(false)} title="New Recruiter">
-        <form onSubmit={handleCreate} className="space-y-4">
-          <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} required placeholder="Full name" />
-          <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="Email address" />
-          <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="Set a password" />
-          <div className="flex gap-2 pt-1">
-            <Button type="submit" disabled={saving}>{saving ? 'Creating...' : 'Create'}</Button>
-            <Button variant="secondary" type="button" onClick={() => setShowForm(false)}>Cancel</Button>
+      {showForm && (
+        <div className="rounded-xl border border-border bg-surface shadow-[0_4px_16px_rgba(0,0,0,0.3)] overflow-hidden">
+          <div className="px-5 py-4 border-b border-border">
+            <h3 className="text-sm font-semibold text-text-primary">New Recruiter</h3>
           </div>
-        </form>
-      </Modal>
+          <div className="p-5">
+            <form onSubmit={handleCreate} className="space-y-4">
+              <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} required placeholder="Full name" />
+              <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="Email address" />
+              <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="Set a password" />
+              <div className="flex gap-2 pt-1">
+                <Button type="submit" disabled={saving}>{saving ? 'Creating...' : 'Create'}</Button>
+                <Button variant="secondary" type="button" onClick={() => setShowForm(false)}>Cancel</Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <Table
         columns={columns}
