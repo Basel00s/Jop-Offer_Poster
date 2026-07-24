@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const PostJob = require('../models/PostJob');
 const Account = require('../models/Account');
+const Group = require('../models/Group');
+const Offer = require('../models/Offer');
 
 function toPublicJob(job) {
   const doc = job.toObject ? job.toObject() : job;
@@ -58,6 +60,20 @@ router.post('/', async (req, res) => {
     const account = await Account.findById(accountId).select('owner').lean();
     if (!account) {
       return res.status(400).json({ error: 'Account not found' });
+    }
+
+    if (req.session.role !== 'owner' && account.owner?.toString() !== req.session.userId) {
+      return res.status(403).json({ error: 'Account does not belong to you' });
+    }
+
+    const ownedGroups = await Group.countDocuments({ _id: { $in: groupIds }, owner: account.owner });
+    if (ownedGroups !== groupIds.length) {
+      return res.status(403).json({ error: 'One or more groups do not belong to you' });
+    }
+
+    const ownedOffers = await Offer.countDocuments({ _id: { $in: offerIds }, owner: account.owner });
+    if (ownedOffers !== offerIds.length) {
+      return res.status(403).json({ error: 'One or more offers do not belong to you' });
     }
 
     const candidates = [];

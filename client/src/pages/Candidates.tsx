@@ -16,8 +16,8 @@ export default function CandidatesPage() {
     try {
       const query = statusFilter ? `?status=${statusFilter}` : '';
       setCandidates(await api<Candidate[]>(`/api/candidates${query}`));
-    } catch {
-      // handled
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Failed to load candidates', 'error');
     }
   };
 

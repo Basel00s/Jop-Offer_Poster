@@ -19,7 +19,11 @@ router.get('/', async (req, res) => {
   } else if (req.query.ownerId) {
     filter.owner = req.query.ownerId;
   }
-  const accounts = await Account.find(filter).sort({ createdAt: -1 });
+  let query = Account.find(filter).sort({ createdAt: -1 });
+  if (req.session.role === 'owner') {
+    query = query.populate('owner', 'name email');
+  }
+  const accounts = await query;
   res.json(accounts.map(toPublicAccount));
 });
 

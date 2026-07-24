@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import api from '../lib/api';
 import type { Account, Group, BulkResult } from '../lib/types';
 import Button from '../components/ui/Button';
@@ -9,6 +10,7 @@ import { Input, Textarea } from '../components/ui/Input';
 import { showToast } from '../components/ui/Toast';
 
 export default function AccountsPage() {
+  const { role } = useOutletContext<{ role: string | null }>();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
 
@@ -44,8 +46,8 @@ export default function AccountsPage() {
     try {
       const data = await api<Account[]>('/api/accounts');
       setAccounts(data);
-    } catch {
-      // handled
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Failed to load accounts', 'error');
     }
   };
 
@@ -53,8 +55,8 @@ export default function AccountsPage() {
     try {
       const data = await api<Group[]>(`/api/accounts/${accountId}/groups`);
       setGroups(data);
-    } catch {
-      // handled
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Failed to load groups', 'error');
     }
   };
 
@@ -198,6 +200,9 @@ export default function AccountsPage() {
   };
 
   const accountColumns = [
+    ...(role === 'owner'
+      ? [{ key: 'owner', header: 'Recruiter', render: (a: Account) => <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600">{a.owner?.name || '—'}</span> }]
+      : []),
     { key: 'name', header: 'Nickname', render: (a: Account) => a.nickname },
     {
       key: 'status',

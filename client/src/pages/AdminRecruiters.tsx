@@ -50,8 +50,8 @@ export default function AdminRecruitersPage() {
   const load = async () => {
     try {
       setRecruiters(await api<Recruiter[]>('/api/admin/recruiters'));
-    } catch {
-      // handled
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Failed to load recruiters', 'error');
     }
   };
 
@@ -117,8 +117,8 @@ export default function AdminRecruitersPage() {
           ? { ...prev, jobs, statusFilter: status, accountFilter: account, accounts: accts }
           : prev
       );
-    } catch {
-      // handled
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Failed to load jobs', 'error');
     }
   }, []);
 

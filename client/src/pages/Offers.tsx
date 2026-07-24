@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import api from '../lib/api';
 import type { Offer, BulkResult } from '../lib/types';
 import Button from '../components/ui/Button';
@@ -9,6 +10,7 @@ import { Input, Textarea } from '../components/ui/Input';
 import { showToast } from '../components/ui/Toast';
 
 export default function OffersPage() {
+  const { role } = useOutletContext<{ role: string | null }>();
   const [offers, setOffers] = useState<Offer[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editOffer, setEditOffer] = useState<Offer | null>(null);
@@ -23,8 +25,8 @@ export default function OffersPage() {
   const loadOffers = async () => {
     try {
       setOffers(await api<Offer[]>('/api/offers'));
-    } catch {
-      // handled
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Failed to load offers', 'error');
     }
   };
 
@@ -115,6 +117,9 @@ export default function OffersPage() {
   };
 
   const columns = [
+    ...(role === 'owner'
+      ? [{ key: 'owner', header: 'Recruiter', render: (o: Offer) => <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600">{o.owner?.name || '—'}</span> }]
+      : []),
     { key: 'title', header: 'Title', render: (o: Offer) => o.title },
     {
       key: 'status',

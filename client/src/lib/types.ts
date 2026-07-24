@@ -1,3 +1,9 @@
+export interface OwnerRef {
+  _id: string;
+  name: string;
+  email: string;
+}
+
 export interface Account {
   _id: string;
   nickname: string;
@@ -9,6 +15,7 @@ export interface Account {
   hasSession: boolean;
   createdAt: string;
   updatedAt: string;
+  owner?: OwnerRef;
 }
 
 export interface Group {
@@ -21,6 +28,7 @@ export interface Group {
   status: 'active' | 'paused';
   createdAt: string;
   updatedAt: string;
+  owner?: OwnerRef;
 }
 
 export interface Position {
@@ -33,6 +41,7 @@ export interface Position {
   status: 'active' | 'paused';
   createdAt: string;
   updatedAt: string;
+  owner?: OwnerRef;
 }
 
 export interface Candidate {
@@ -58,6 +67,7 @@ export interface Offer {
   status: 'active' | 'paused';
   createdAt: string;
   updatedAt: string;
+  owner?: OwnerRef;
 }
 
 export interface PostJob {

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import api from '../lib/api';
 import type { Group } from '../lib/types';
 import Button from '../components/ui/Button';
@@ -9,6 +10,7 @@ import { Input } from '../components/ui/Input';
 import { showToast } from '../components/ui/Toast';
 
 export default function GroupsPage() {
+  const { role } = useOutletContext<{ role: string | null }>();
   const [groups, setGroups] = useState<Group[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editGroup, setEditGroup] = useState<Group | null>(null);
@@ -21,8 +23,8 @@ export default function GroupsPage() {
   const loadGroups = async () => {
     try {
       setGroups(await api<Group[]>('/api/groups'));
-    } catch {
-      // handled
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Failed to load groups', 'error');
     }
   };
 
@@ -81,6 +83,9 @@ export default function GroupsPage() {
   };
 
   const columns = [
+    ...(role === 'owner'
+      ? [{ key: 'owner', header: 'Recruiter', render: (g: Group) => <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600">{g.owner?.name || '—'}</span> }]
+      : []),
     { key: 'name', header: 'Name', render: (g: Group) => g.name },
     {
       key: 'url',

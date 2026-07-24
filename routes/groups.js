@@ -11,7 +11,11 @@ router.get('/', async (req, res) => {
   } else if (req.query.ownerId) {
     filter.owner = req.query.ownerId;
   }
-  const groups = await Group.find(filter).sort({ createdAt: -1 });
+  let query = Group.find(filter).sort({ createdAt: -1 });
+  if (req.session.role === 'owner') {
+    query = query.populate('owner', 'name email');
+  }
+  const groups = await query;
   res.json(groups);
 });
 
