@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import Button from '../components/ui/Button';
 
 interface PositionOption {
   _id: string;
@@ -22,6 +23,20 @@ export default function Apply() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [positionError, setPositionError] = useState('');
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const validate = (f: typeof form) => {
+    const e: Record<string, string> = {};
+    if (f.name.trim().length < 3) e.name = 'Name must be at least 3 characters';
+    const digitsOnly = f.phone.replace(/\D/g, '');
+    if (digitsOnly.length < 8) e.phone = 'Phone must contain at least 8 numbers';
+    const url = f.recordingUrl.trim().toLowerCase();
+    if (!url.startsWith('http') || !['vocaroo', 'soundcloud', 'youtube'].some((s) => url.includes(s)))
+      e.recordingUrl = 'Link must start with http and contain Vocaroo, SoundCloud, or YouTube';
+    return e;
+  };
 
   const [form, setForm] = useState({
     name: '',
@@ -56,13 +71,23 @@ export default function Apply() {
       });
   }, [slug]);
 
-  const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm((f) => ({ ...f, [field]: e.target.value }));
+  const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const next = { ...form, [field]: e.target.value };
+    setForm(next);
+    setTouched((t) => ({ ...t, [field]: true }));
+    setErrors(validate(next));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setPositionError('');
+
+    const allTouched = { name: true, phone: true, recordingUrl: true };
+    setTouched((t) => ({ ...t, ...allTouched }));
+    const validationErrors = validate(form);
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) return;
 
     if (!form.position) {
       setPositionError('Please select a position above');
@@ -127,10 +152,14 @@ export default function Apply() {
   }
 
   const inputClass =
-    'w-full mt-1.5 px-3.5 py-2.5 rounded-lg border border-border bg-bg-600 text-text-primary text-sm placeholder:text-text-muted transition-colors duration-150 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20';
+    'w-full mt-1.5 px-3.5 py-2.5 rounded-lg border bg-bg-600 text-text-primary text-sm placeholder:text-text-muted transition-colors duration-150 focus:outline-none focus:ring-2';
+  const inputErrorClass = 'border-danger focus:border-danger focus:ring-danger/20';
+  const inputNormalClass = 'border-border focus:border-accent focus:ring-accent/20';
   const labelClass = 'block text-sm text-text-secondary font-medium';
   const fieldsetClass = 'rounded-xl border border-border bg-surface p-6';
   const selectClass = inputClass;
+
+  const hasErrors = Object.keys(errors).length > 0;
 
   if (loading) return null;
 
@@ -150,11 +179,25 @@ export default function Apply() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <label className={labelClass}>
                 Candidate Name
-                <input className={inputClass} value={form.name} onChange={set('name')} required placeholder="Full name" />
+                <input
+                  className={`${inputClass} ${errors.name && touched.name ? inputErrorClass : inputNormalClass}`}
+                  value={form.name}
+                  onChange={set('name')}
+                  required
+                  placeholder="Full name"
+                />
+                {errors.name && touched.name && <p className="text-danger text-xs mt-1">{errors.name}</p>}
               </label>
               <label className={labelClass}>
                 Phone
-                <input className={inputClass} value={form.phone} onChange={set('phone')} required placeholder="Phone number" />
+                <input
+                  className={`${inputClass} ${errors.phone && touched.phone ? inputErrorClass : inputNormalClass}`}
+                  value={form.phone}
+                  onChange={set('phone')}
+                  required
+                  placeholder="Phone number"
+                />
+                {errors.phone && touched.phone && <p className="text-danger text-xs mt-1">{errors.phone}</p>}
               </label>
               <label className={labelClass}>
                 Graduation
@@ -234,7 +277,14 @@ export default function Apply() {
 
               <label className={labelClass}>
                 Recording link
-                <input className={inputClass} value={form.recordingUrl} onChange={set('recordingUrl')} required placeholder="Paste your Vocaroo link here" />
+                <input
+                  className={`${inputClass} ${errors.recordingUrl && touched.recordingUrl ? inputErrorClass : inputNormalClass}`}
+                  value={form.recordingUrl}
+                  onChange={set('recordingUrl')}
+                  required
+                  placeholder="Paste your Vocaroo link here"
+                />
+                {errors.recordingUrl && touched.recordingUrl && <p className="text-danger text-xs mt-1">{errors.recordingUrl}</p>}
               </label>
             </div>
           </fieldset>
@@ -292,13 +342,13 @@ export default function Apply() {
             </div>
           )}
 
-          <button
+          <Button
             type="submit"
-            disabled={sending}
-            className="w-full py-3 rounded-lg text-sm font-semibold bg-accent text-white shadow-[0_2px_10px_rgba(139,92,246,0.3)] hover:bg-accent-hover transition-all duration-150 disabled:opacity-50"
+            disabled={sending || hasErrors}
+            className="w-full"
           >
             {sending ? 'Submitting...' : 'Submit Application'}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

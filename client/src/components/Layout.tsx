@@ -73,18 +73,14 @@ const navItems = [
 ];
 
 export default function Layout() {
-  const [role, setRole] = useState<string | null>(null);
-  const [applySlug, setApplySlug] = useState<string | null>(null);
+  const [user, setUser] = useState<{ role: string | null; applySlug: string | null; name?: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
 
   useEffect(() => {
-    api<{ role: string | null; applySlug: string | null }>('/api/auth/me')
-      .then((data) => {
-        setRole(data.role);
-        setApplySlug(data.applySlug);
-      })
-      .catch(() => setRole(null))
+    api<{ role: string | null; applySlug: string | null; name?: string }>('/api/auth/me')
+      .then((data) => setUser(data))
+      .catch(() => setUser({ role: null, applySlug: null }))
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -98,6 +94,9 @@ export default function Layout() {
       </div>
     );
   }
+
+  const role = user?.role ?? null;
+  const applySlug = user?.applySlug ?? null;
 
   if (!role) {
     return <Navigate to="/login" replace />;
@@ -167,6 +166,25 @@ export default function Layout() {
         </nav>
 
         <div className="px-3 pb-4 pt-3 border-t border-slate-200">
+          {user?.name && (
+            <div className="flex items-center gap-3 px-3.5 py-2 mb-1">
+              <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 text-xs font-bold uppercase">
+                {user.name.charAt(0)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium text-slate-900 truncate">{user.name}</div>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider ${
+                    role === 'owner'
+                      ? 'bg-amber-50 text-amber-700'
+                      : 'bg-blue-50 text-blue-700'
+                  }`}>
+                    {role === 'owner' ? 'Owner' : 'Recruiter'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 w-full px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:text-red-600 hover:bg-red-50 transition-all duration-150"

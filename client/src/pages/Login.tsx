@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Button from '../components/ui/Button';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -80,13 +81,13 @@ export default function Login() {
               </div>
             )}
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 rounded-lg text-sm font-semibold bg-accent text-white shadow-[0_2px_8px_rgba(139,92,246,0.25)] hover:bg-accent-hover transition-all duration-150 disabled:opacity-50"
+              className="w-full"
             >
               {loading ? 'Signing in...' : 'Sign In'}
-            </button>
+            </Button>
           </form>
         </div>
       </div>

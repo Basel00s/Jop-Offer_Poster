@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import api from '../lib/api';
 import type { Candidate } from '../lib/types';
 import StatusPill from '../components/ui/StatusPill';
@@ -9,6 +10,7 @@ import { showToast } from '../components/ui/Toast';
 const statuses = ['submitted', 'offer_selected', 'accepted', 'rejected'] as const;
 
 export default function CandidatesPage() {
+  const { role } = useOutletContext<{ role: string | null }>();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [statusFilter, setStatusFilter] = useState<string>('');
 
@@ -40,6 +42,17 @@ export default function CandidatesPage() {
 
   const canAct = (s: string) => s === 'submitted' || s === 'offer_selected';
 
+  const recruiterCol = role === 'owner'
+    ? [{
+        key: 'recruiter' as const,
+        header: 'Recruiter',
+        render: (c: Candidate) => {
+          const r = c.recruiter;
+          return r && typeof r === 'object' ? r.name : '-';
+        },
+      }]
+    : [];
+
   const columns = [
     { key: 'name', header: 'Name', render: (c: Candidate) => c.name },
     { key: 'phone', header: 'Phone', render: (c: Candidate) => c.phone },
@@ -56,6 +69,7 @@ export default function CandidatesPage() {
       header: 'Position',
       render: (c: Candidate) => (c.position as { title: string } | undefined)?.title || '-',
     },
+    ...recruiterCol,
     {
       key: 'status',
       header: 'Status',

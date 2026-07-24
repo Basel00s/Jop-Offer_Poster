@@ -54,6 +54,7 @@ export interface Candidate {
   languageLevel: string;
   nationality: string;
   position: Position | string;
+  recruiter: string | { _id: string; name: string };
   recordingUrl: string;
   status: 'submitted' | 'offer_selected' | 'accepted' | 'rejected';
   createdAt: string;
